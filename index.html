@@ -1663,7 +1663,7 @@
             updateProgressUI();
 
             // Check for 100% completion
-            var completedCount = Object.keys(progress).length;
+            var completedCount = Object.keys(progress).filter(function(k) { var n = parseInt(k); return n >= 1 && n <= TOTAL_MISSIONS; }).length;
             if (completedCount >= TOTAL_MISSIONS) {
                 setTimeout(function() {
                     document.getElementById('finalCard').classList.add('revealed');
@@ -1677,7 +1677,7 @@
            ═══════════════════════════════════════════ */
         function updateProgressUI() {
             var progress = getProgress();
-            var completedCount = Object.keys(progress).length;
+            var completedCount = Object.keys(progress).filter(function(k) { var n = parseInt(k); return n >= 1 && n <= TOTAL_MISSIONS; }).length;
             var pct = (completedCount / TOTAL_MISSIONS) * 100;
 
             document.getElementById('progressFill').style.width = pct + '%';
