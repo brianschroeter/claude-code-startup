@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "cohen-onboarding",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-l", "3847", "/Users/brianschroeter/Documents/projects/claude-code-startup"],
+      "port": 3847
+    }
+  ]
+}

@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cohen's Claude Code Journey</title>
+    <script src="https://kit.fontawesome.com/362a70b2e0.js" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ═══════════════════════════════════════════
+           CSS CUSTOM PROPERTIES
+           ═══════════════════════════════════════════ */
+        :root {
+            --bg-deep: #06060f;
+            --bg-mid: #0d0b1e;
+            --bg-upper: #0f1729;
+            --card-bg: rgba(255, 255, 255, 0.06);
+            --card-border: rgba(139, 92, 246, 0.25);
+            --card-border-hover: rgba(139, 92, 246, 0.5);
+            --card-border-complete: rgba(245, 158, 11, 0.5);
+            --purple: #8b5cf6;
+            --purple-light: #a78bfa;
+            --purple-glow: rgba(139, 92, 246, 0.3);
+            --gold: #f59e0b;
+            --gold-light: #fbbf24;
+            --gold-glow: rgba(245, 158, 11, 0.4);
+            --emerald: #10b981;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --code-bg: rgba(0, 0, 0, 0.4);
+            --font-display: 'Orbitron', sans-serif;
+            --font-body: 'Outfit', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        /* ═══════════════════════════════════════════
+           RESET & BASE
+           ═══════════════════════════════════════════ */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html {
+            scroll-behavior: smooth;
+            scrollbar-width: thin;
+            scrollbar-color: var(--purple) var(--bg-deep);
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--purple); border-radius: 3px; }
+
+        /* ═══════════════════════════════════════════
+           STAR CANVAS
+           ═══════════════════════════════════════════ */
+        #starfield {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Nebula gradient overlay */
+        .nebula-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 80% 50% at 20% 40%, rgba(88, 28, 135, 0.15), transparent),
+                radial-gradient(ellipse 60% 40% at 80% 20%, rgba(30, 58, 138, 0.12), transparent),
+                radial-gradient(ellipse 50% 60% at 60% 80%, rgba(88, 28, 135, 0.08), transparent);
+        }
+
+        /* ═══════════════════════════════════════════
+           PROGRESS TOP BAR
+           ═══════════════════════════════════════════ */
+        .top-bar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 56px;
+            background: rgba(6, 6, 15, 0.85);
+            backdrop-filter: blur(20px) saturate(1.5);
+            -webkit-backdrop-filter: blur(20px) saturate(1.5);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .top-bar.scrolled {
+            box-shadow: 0 4px 30px rgba(139, 92, 246, 0.1);
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-display);
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        .top-bar-left i {
+            color: var(--purple);
+            font-size: 0.9rem;
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .progress-container {
+            width: 200px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--purple), var(--gold));
+            border-radius: 3px;
+            transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 20px; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4));
+            border-radius: 3px;
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .progress-text {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--gold);
+            min-width: 40px;
+            text-align: right;
+        }
+
+        .star-indicators {
+            display: flex;
+            gap: 4px;
+        }
+
+        .star-indicators i {
+            font-size: 0.55rem;
+            color: var(--text-muted);
+            transition: all 0.4s ease;
+        }
+
+        .star-indicators i.earned {
+            color: var(--gold);
+            filter: drop-shadow(0 0 4px var(--gold-glow));
+            animation: starPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes starPop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.6); }
+            100% { transform: scale(1); }
+        }
+
+        /* ═══════════════════════════════════════════
+           HERO SECTION
+           ═══════════════════════════════════════════ */
+        .hero {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 80px 24px 60px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            border-radius: 100px;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--purple-light);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 32px;
+            background: rgba(139, 92, 246, 0.06);
+            animation: fadeInDown 0.8s ease both;
+        }
+
+        .hero-badge i {
+            font-size: 0.65rem;
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 7vw, 5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--purple-light) 40%, var(--gold-light) 80%, var(--text-primary) 100%);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 0.8s ease both, gradientShift 8s ease infinite;
+            animation-delay: 0.2s, 0s;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.35rem);
+            color: var(--text-secondary);
+            font-weight: 300;
+            max-width: 500px;
+            margin-bottom: 48px;
+            animation: fadeInUp 0.8s ease both;
+            animation-delay: 0.4s;
+        }
+
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 36px;
+            background: linear-gradient(135deg, var(--purple), #6d28d9);
+            color: white;
+            font-family: var(--font-display);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            text-decoration: none;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeInUp 0.8s ease both, pulse-glow 3s ease-in-out infinite;
+            animation-delay: 0.6s, 1.4s;
+        }
+
+        .hero-cta:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 40px rgba(139, 92, 246, 0.4);
+        }
+
+        .hero-cta::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .hero-cta:hover::before {
+            left: 100%;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2); }
+            50% { box-shadow: 0 4px 40px rgba(139, 92, 246, 0.4); }
+        }
+
+        .hero-stats {
+            margin-top: 48px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            animation: fadeInUp 0.8s ease both;
+            animation-delay: 0.8s;
+        }
+
+        .hero-stats i {
+            color: var(--purple);
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ═══════════════════════════════════════════
+           MISSION CARDS SECTION
+           ═══════════════════════════════════════════ */
+        .missions {
+            position: relative;
+            z-index: 1;
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 0 24px 120px;
+        }
+
+        .missions-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .missions-header h2 {
+            font-family: var(--font-display);
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .missions-header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Individual card */
+        .mission-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+        }
+
+        .mission-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(139,92,246,0.02));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            transition: all 0.4s ease;
+        }
+
+        .mission-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--card-border-hover);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 40px rgba(139, 92, 246, 0.12);
+        }
+
+        .mission-card.completed {
+            border-color: var(--card-border-complete);
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.06);
+        }
+
+        .mission-card.completed::before {
+            background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.02));
+        }
+
+        .mission-card.expanded {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--card-border-hover);
+        }
+
+        /* Card header (always visible) */
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px 24px;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        .card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--purple-light);
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .mission-card:hover .card-icon {
+            background: rgba(139, 92, 246, 0.18);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
+        }
+
+        .mission-card.completed .card-icon {
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--gold);
+        }
+
+        .card-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .card-title {
+            font-family: var(--font-display);
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            margin-bottom: 2px;
+            color: var(--text-primary);
+        }
+
+        .card-tagline {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .card-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .card-badge {
+            display: none;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .mission-card.completed .card-badge {
+            display: inline-flex;
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--gold);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .card-chevron {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .mission-card.expanded .card-chevron {
+            transform: rotate(180deg);
+        }
+
+        /* Card content (expandable) */
+        .card-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .mission-card.expanded .card-content {
+            max-height: 2000px;
+        }
+
+        .card-body {
+            padding: 0 24px 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            padding-top: 20px;
+        }
+
+        .card-body p {
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            line-height: 1.75;
+        }
+
+        .card-body strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .card-body ul {
+            list-style: none;
+            margin-bottom: 16px;
+        }
+
+        .card-body ul li {
+            position: relative;
+            padding-left: 20px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .card-body ul li::before {
+            content: '\203A';
+            position: absolute;
+            left: 0;
+            color: var(--purple);
+            font-weight: 700;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        /* Code blocks */
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-block::before {
+            content: 'terminal';
+            position: absolute;
+            top: 0; right: 0;
+            padding: 2px 10px;
+            font-family: var(--font-mono);
+            font-size: 0.55rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            background: rgba(255,255,255,0.04);
+            border-radius: 0 10px 0 8px;
+        }
+
+        .code-block code {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--purple-light);
+            line-height: 1.8;
+            white-space: pre;
+        }
+
+        .code-block code .comment {
+            color: var(--text-muted);
+        }
+
+        .code-block code .cmd {
+            color: var(--emerald);
+        }
+
+        .code-block code .flag {
+            color: var(--gold);
+        }
+
+        /* Pro tip callout */
+        .pro-tip {
+            background: rgba(245, 158, 11, 0.05);
+            border: 1px solid rgba(245, 158, 11, 0.12);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .pro-tip i {
+            color: var(--gold);
+            font-size: 0.85rem;
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+
+        .pro-tip p {
+            font-size: 0.85rem;
+            margin-bottom: 0 !important;
+            color: var(--text-secondary);
+        }
+
+        /* Comparison table */
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 16px;
+            font-size: 0.85rem;
+        }
+
+        .compare-table th {
+            font-family: var(--font-display);
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--purple-light);
+            text-align: left;
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.15);
+        }
+
+        .compare-table td {
+            padding: 10px 14px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .compare-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Mark as explored button */
+        .explore-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            background: transparent;
+            color: var(--purple-light);
+            font-family: var(--font-display);
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border: 1px solid var(--card-border-hover);
+            border-radius: 60px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+
+        .explore-btn:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: var(--purple);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .explore-btn.explored {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+            color: var(--gold);
+            cursor: default;
+            pointer-events: none;
+        }
+
+        /* ═══════════════════════════════════════════
+           FINAL / COMPLETION CARD
+           ═══════════════════════════════════════════ */
+        .final-card {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(139, 92, 246, 0.08));
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 20px;
+            padding: 48px 32px;
+            text-align: center;
+            margin-top: 32px;
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            pointer-events: none;
+            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .final-card.revealed {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .final-card h2 {
+            font-family: var(--font-display);
+            font-size: clamp(1.2rem, 3vw, 1.6rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--gold-light), var(--purple-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+        }
+
+        .final-card p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            max-width: 440px;
+            margin: 0 auto;
+        }
+
+        .final-card .trophy {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* ═══════════════════════════════════════════
+           SPARKLE & CONFETTI EFFECTS
+           ═══════════════════════════════════════════ */
+        .sparkle-container {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            animation: sparkleFloat 1s ease-out forwards;
+        }
+
+        @keyframes sparkleFloat {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-80px) scale(0); opacity: 0; }
+        }
+
+        .confetti-piece {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            animation: confettiFall 3s ease-in forwards;
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* ═══════════════════════════════════════════
+           RESPONSIVE
+           ═══════════════════════════════════════════ */
+        @media (max-width: 640px) {
+            .top-bar { padding: 0 16px; }
+            .progress-container { width: 100px; }
+            .star-indicators { display: none; }
+            .card-header { padding: 16px; gap: 12px; }
+            .card-body { padding: 0 16px 20px; padding-top: 16px; }
+            .card-icon { width: 38px; height: 38px; font-size: 0.95rem; }
+            .card-title { font-size: 0.72rem; }
+            .hero-cta { padding: 12px 28px; font-size: 0.72rem; }
+        }
+
+        /* ═══════════════════════════════════════════
+           INITIAL LOAD ANIMATION
+           ═══════════════════════════════════════════ */
+        .mission-card {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .mission-card.visible {
+            animation: cardReveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes cardReveal {
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Star field canvas -->
+    <canvas id="starfield"></canvas>
+    <div class="nebula-overlay"></div>
+
+    <!-- Sparkle container for effects -->
+    <div class="sparkle-container" id="sparkleContainer"></div>
+
+    <!-- Fixed top progress bar -->
+    <div class="top-bar" id="topBar">
+        <div class="top-bar-left">
+            <i class="fa-solid fa-planet-ringed"></i>
+            <span>Cohen's Journey</span>
+        </div>
+        <div class="top-bar-right">
+            <div class="star-indicators" id="starIndicators"></div>
+            <div class="progress-container">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0/10</div>
+        </div>
+    </div>
+
+    <!-- Hero -->
+    <section class="hero" id="hero">
+        <div class="hero-badge">
+            <i class="fa-solid fa-signal-stream"></i>
+            <span>Transmission Received</span>
+        </div>
+        <h1>Welcome, Cohen</h1>
+        <p class="hero-subtitle">Your journey into AI-powered coding starts here. Each mission below unlocks a new superpower.</p>
+        <button class="hero-cta" onclick="document.getElementById('missions').scrollIntoView({behavior:'smooth'})">
+            <i class="fa-solid fa-rocket"></i>
+            Begin Your Journey
+        </button>
+        <div class="hero-stats">
+            <i class="fa-solid fa-constellation"></i>
+            <span>10 missions to explore</span>
+        </div>
+    </section>
+
+    <!-- Missions -->
+    <section class="missions" id="missions">
+        <div class="missions-header">
+            <h2>Mission Control</h2>
+            <p>Click any mission to expand it. Mark each one explored as you go.</p>
+        </div>
+
+        <!-- ════════ MISSION 1 ════════ -->
+        <div class="mission-card" data-mission="1">
+            <div class="card-header" onclick="toggleCard(this)">
+                <div class="card-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                <div class="card-info">
+                    <div class="card-title">What is Claude Code?</div>
+                    <div class="card-tagline">Two ways to wield AI power</div>
+                </div>
+                <div class="card-status">
+                    <span class="card-badge"><i class="fa-solid fa-star"></i> Explored</span>
+                </div>
+                <div class="card-chevron"><i class="fa-solid fa-chevron-down"></i></div>
+            </div>
+            <div class="card-content">
+                <div class="card-body">
+                    <p>Claude Code comes in <strong>two flavors</strong>, and you'll want to use both depending on what you're doing. Think of them as two cockpits for the same spaceship.</p>
+
+                    <table class="compare-table">
+                        <tr>
+                            <th></th>
+                            <th>Claude Code CLI</th>
+                            <th>Claude Desktop</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Where</strong></td>
+                            <td>Your terminal</td>
+                            <td>Desktop app</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Best for</strong></td>
+                            <td>Building, coding, file ops</td>
+                            <td>Brainstorming, planning, chat</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Superpower</strong></td>
+                            <td>Reads &amp; writes your files directly</td>
+                            <td>Artifacts, visual outputs</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Vibe</strong></td>
+                            <td>Pair programmer at your side</td>
+                            <td>Thinking partner across the table</td>
+                        </tr>
+                    </table>
+
+                    <div class="pro-tip">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <p><strong>When to use which?</strong> If you're about to write or edit code, reach for the CLI. If you're thinking through a problem, planning architecture, or want a visual artifact, open the Desktop app.</p>
+                    </div>
+
+                    <button class="explore-btn" onclick="markExplored(1, this, event)">
+                        <i class="fa-solid fa-circle-check"></i>
+                        Mark as Explored
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════════ MISSION 2 ════════ -->
+        <div class="mission-card" data-mission="2">
+            <div class="card-header" onclick="toggleCard(this)">
+                <div class="card-icon"><i class="fa-solid fa-crown"></i></div>
+                <div class="card-info">
+                    <div class="card-title">Your MAX Subscription</div>
+                    <div class="card-tagline">You've got the keys to the kingdom</div>
+                </div>
+                <div class="card-status">
+                    <span class="card-badge"><i class="fa-solid fa-star"></i> Explored</span>
+                </div>
+                <div class="card-chevron"><i class="fa-solid fa-chevron-down"></i></div>
+            </div>
+            <div class="card-content">
+                <div class="card-body">
+                    <p>Your MAX plan is the highest tier Anthropic offers for individuals. Here's what it gives you that most people don't have:</p>
+
+                    <ul>
+                        <li><strong>5x or 20x usage</strong> compared to the Pro plan -- you can have significantly longer conversations and run more tasks before hitting limits</li>
+                        <li><strong>Extended thinking</strong> -- Claude can "think longer" on hard problems, producing dramatically better results for complex coding tasks</li>
+                        <li><strong>Priority access</strong> -- you skip the queue when servers are busy</li>
+                        <li><strong>Claude Opus</strong> -- access to the most powerful model in the family, best for deep reasoning and complex projects</li>
+                        <li><strong>Dispatch &amp; Cowork</strong> -- MAX-exclusive features for multi-agent workflows</li>
+                    </ul>
+
+                    <div class="pro-tip">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <p><strong>Usage tip:</strong> Don't ration your messages! With MAX, you have plenty of capacity. The best way to learn is to use Claude constantly -- ask questions, have it review your code, use it as a sounding board for ideas.</p>
+                    </div>
+
+                    <button class="explore-btn" onclick="markExplored(2, this, event)">
+                        <i class="fa-solid fa-circle-check"></i>
+                        Mark as Explored
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════════ MISSION 3 ════════ -->
+        <div class="mission-card" data-mission="3">
+            <div class="card-header" onclick="toggleCard(this)">
+                <div class="card-icon"><i class="fa-solid fa-terminal"></i></div>
+                <div class="card-info">
+                    <div class="card-title">Claude Code CLI</div>
+                    <div class="card-tagline">Your command center</div>
+                </div>
+                <div class="card-status">
+                    <span class="card-badge"><i class="fa-solid fa-star"></i> Explored</span>
+                </div>
+                <div class="card-chevron"><i class="fa-solid fa-chevron-down"></i></div>
+            </div>
+            <div class="card-content">
+                <div class="card-body">
+                    <p>Claude Code CLI is where the real magic happens. It lives in your terminal and can <strong>read, write, and execute</strong> files on your machine. It's like having a senior developer pair-programming with you 24/7.</p>
+
+                    <p><strong>Getting started:</strong></p>
+                    <div class="code-block"><code><span class="comment"># Install Claude Code globally</span>
+<span class="cmd">npm</span> install -g <span class="flag">@anthropic-ai/claude-code</span>
+
+<span class="comment"># Navigate to your project and launch</span>
+<span class="cmd">cd</span> my-project
+<span class="cmd">claude</span>
+
+<span class="comment"># Or start a brand new project</span>
+<span class="cmd">claude</span> <span class="flag">"Create a React app with a todo list"</span></code></div>
+
+                    <p><strong>Key slash commands you'll use constantly:</strong></p>
+                    <ul>
+                        <li><strong>/help</strong> -- see all available commands</li>
+                        <li><strong>/model</strong> -- switch between Opus, Sonnet, Haiku models</li>
+                        <li><strong>/clear</strong> -- reset the conversation context</li>
+                        <li><strong>/compact</strong> -- summarize the conversation to free up context</li>
+                        <li><strong>/cost</strong> -- see how much of your usage you've spent</li>
+                    </ul>
+
+                    <div class="pro-tip">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <p><strong>Power move:</strong> Create a <code>CLAUDE.md</code> file in your project root. This is like a "cheat sheet" Claude reads every time it starts. Put your project conventions, tech stack info, and preferences in there. Claude will follow them automatically.</p>
+                    </div>
+
+                    <button class="explore-btn" onclick="markExplored(3, this, event)">
+                        <i class="fa-solid fa-circle-check"></i>
+                        Mark as Explored
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════════ MISSION 4 ════════ -->
+        <div class="mission-card" data-mission="4">
+            <div class="card-header" onclick="toggleCard(this)">
+                <div class="card-icon"><i class="fa-solid fa-message-bot"></i></div>
+                <div class="card-info">
+                    <div class="card-title">Claude Desktop App</div>
+                    <div class="card-tagline">Your visual thinking partner</div>
+                </div>
+                <div class="card-status">
+                    <span class="card-badge"><i class="fa-solid fa-star"></i> Explored</span>
+                </div>
+                <div class="card-chevron"><i class="fa-solid fa-chevron-down"></i></div>
+            </div>
+            <div class="card-content">
+                <div class="card-body">
+                    <p>The Claude Desktop app (at <strong>claude.ai</strong> or the native macOS/Windows app) is your <strong>thinking partner</strong>. While the CLI is for building, the Desktop app excels at conversations, planning, and creating visual artifacts.</p>
+
+                    <p><strong>What makes it special:</strong></p>
+                    <ul>
+                        <li><strong>Artifacts</strong> -- Claude can generate interactive React components, diagrams, documents, and more right in the chat</li>
+                        <li><strong>Projects</strong> -- organize conversations by topic, add reference files Claude can always access</li>
+                        <li><strong>File uploads</strong> -- drag in images, PDFs, code files for Claude to analyze</li>
+                        <li><strong>Conversation history</strong> -- everything is saved and searchable</li>
+                    </ul>
+
+                    <div class="pro-tip">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <p><strong>Workflow combo:</strong> Use Desktop to brainstorm your architecture and plan, then switch to CLI to actually build it. Desktop for the "what," CLI for the "how."</p>
+                    </div>
+
+                    <button class="explore-btn" onclick="markExplored(4, this, event)">
+                        <i class="fa-solid fa-circle-check"></i>
+                        Mark as Explored
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════════ MISSION 5 ════════ -->
+        <div class="mission-card" data-mission="5">
+            <div class="card-header" onclick="toggleCard(this)">
+                <div class="card-icon"><i class="fa-solid fa-users-gear"></i></div>
+                <div class="card-info">
+                    <div class="card-title">Cowork Mode</div>
+                    <div class="card-tagline">Code together with Claude</div>
+                </div>
+                <div class="card-status">
+                    <span class="card-badge"><i class="fa-solid fa-star"></i> Explored</span>
+                </div>
+                <div class="card-chevron"><i class="fa-solid fa-chevron-down"></i></div>
+            </div>
+            <div class="card-content">
+                <div class="card-body">
+                    <p>Cowork is one of the coolest features exclusive to your MAX plan. It turns Claude into a <strong>background coding partner</strong> that watches what you're working on and proactively helps.</p>
+
+                    <p><strong>How it works:</strong></p>
+                    <ul>
+                        <li>Claude monitors your code changes in real-time</li>
+                        <li>It can suggest improvements, catch bugs, and offer refactors</li>
+                        <li>You stay in the driver's seat -- Claude assists, you decide</li>
+                        <li>Think of it like having a code reviewer watching over your shoulder (in a good way!)</li>
+                    </ul>
+
+                    <div class="code-block"><code><span class="comment"># Start Claude Code in cowork mode</span>
+<span class="cmd">claude</span> <span class="flag">--cowork</span>
+
+<span class="comment"># Or use the /cowork command inside a session</span>
+<span class="cmd">/cowork</span></code></div>
+
+                    <div class="pro-tip">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <p><strong>Best for:</strong> Longer coding sessions where you want a safety net. Cowork catches the bugs you'd normally find hours later in testing.</p>
+                    </div>
+
+                    <button class="explore-btn" onclick="markExplored(5, this, event)">
+                        <i class="fa-solid fa-circle-check"></i>
+                        Mark as Explored
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════════ MISSION 6 ════════ -->
+        <div class="mission-card" data-mission="6">
+            <div class="card-header" onclick="toggleCard(this)">
+                <div class="card-icon"><i class="fa-solid fa-satellite-dish"></i></div>
+                <div class="card-info">
+                    <div class="card-title">Dispatch</div>
+                    <div class="card-tagline">Send out your fleet</div>
+                </div>
+                <div class="card-status">
+                    <span class="card-badge"><i class="fa-solid fa-star"></i> Explored</span>
+                </div>
+                <div class="card-chevron"><i class="fa-solid fa-chevron-down"></i></div>
+            </div>
+            <div class="card-content">
+                <div class="card-body">
+                    <p>Dispatch is the <strong>newest and most powerful</strong> feature in the Claude Code ecosystem. It lets you orchestrate <strong>multiple Claude agents in parallel</strong> -- like having a whole team of developers at your command.</p>
+
+                    <p><strong>What you can do:</strong></p>
+                    <ul>
+                        <li><strong>Parallel tasks</strong> -- ask Claude to work on multiple files or features simultaneously</li>
+                        <li><strong>Sub-agents</strong> -- Claude spawns focused workers for specific jobs, then synthesizes the results</li>
+                        <li><strong>Complex projects</strong> -- break down an entire app into pieces and have agents tackle each part</li>
+                        <li><strong>Research + Build</strong> -- one agent researches the approach while another starts scaffolding</li>
+                    </ul>
+
+                    <div class="code-block"><code><span class="comment"># Example: Claude dispatches agents for parallel work</span>
+<span class="cmd">claude</span> <span class="flag">"Build a full-stack todo app. Create the</span>
+<span class="flag">API, frontend, and database schema in parallel."</span>
+
+<span class="comment"># Claude automatically dispatches sub-agents:</span>
+<span class="comment">#   Agent 1: Database schema design</span>
+<span class="comment">#   Agent 2: REST API endpoints</span>
+<span class="comment">#   Agent 3: React frontend components</span></code></div>
+
+                    <div class="pro-tip">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <p><strong>This is a MAX exclusive.</strong> Dispatch uses significantly more compute, which is why it requires a MAX plan. Use it for bigger tasks where parallelism actually helps -- small scripts don't need it.</p>
+                    </div>
+
+                    <button class="explore-btn" onclick="markExplored(6, this, event)">
+                        <i class="fa-solid fa-circle-check"></i>
+                        Mark as Explored
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════════ MISSION 7 ════════ -->
+        <div class="mission-card" data-mission="7">
+            <div class="card-header" onclick="toggleCard(this)">
+                <div class="card-icon"><i class="fa-solid fa-puzzle-piece"></i></div>
+                <div class="card-info">
+                    <div class="card-title">Essential Plugins</div>
+                    <div class="card-tagline">Supercharge your setup</div>
+                </div>
+                <div class="card-status">
+                    <span class="card-badge"><i class="fa-solid fa-star"></i> Explored</span>
+                </div>
+                <div class="card-chevron"><i class="fa-solid fa-chevron-down"></i></div>
+            </div>
+            <div class="card-content">
+                <div class="card-body">
+                    <p>Claude Code supports <strong>plugins</strong> that extend its capabilities. These are the ones you'll want to install right away:</p>
+
+                    <p><strong><i class="fa-solid fa-bolt" style="color:var(--gold)"></i> Superpowers</strong> -- The must-have plugin. Adds brainstorming workflows, test-driven development, systematic debugging, code review, and skill-based workflows. Makes Claude dramatically more effective.</p>
+                    <div class="code-block"><code><span class="cmd">claude</span> plugin add <span class="flag">superpowers</span></code></div>
+
+                    <p><strong><i class="fa-solid fa-book" style="color:var(--purple-light)"></i> Context7</strong> -- Gives Claude access to up-to-date documentation for libraries and frameworks. Instead of relying on training data, Claude fetches the latest docs in real-time.</p>
+                    <div class="code-block"><code><span class="cmd">claude</span> plugin add <span class="flag">context7</span></code></div>
+
+                    <p><strong><i class="fa-brands fa-github" style="color:var(--text-primary)"></i> GitHub</strong> -- Full GitHub integration: create PRs, review code, manage issues, browse repos -- all from the CLI.</p>
+                    <div class="code-block"><code><span class="cmd">claude</span> plugin add <span class="flag">github</span></code></div>
+
+                    <div class="pro-tip">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <p><strong>Start with Superpowers.</strong> It's the biggest quality-of-life improvement. Context7 is great once you start working with specific frameworks. GitHub plugin becomes essential when you're pushing code.</p>
+                    </div>
+
+                    <button class="explore-btn" onclick="markExplored(7, this, event)">
+                        <i class="fa-solid fa-circle-check"></i>
+                        Mark as Explored
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════════ MISSION 8 ════════ -->
+        <div class="mission-card" data-mission="8">
+            <div class="card-header" onclick="toggleCard(this)">
+                <div class="card-icon"><i class="fa-solid fa-plug-circle-bolt"></i></div>
+                <div class="card-info">
+                    <div class="card-title">MCPs &amp; Connectors</div>
+                    <div class="card-tagline">Connect Claude to everything</div>
+                </div>
+                <div class="card-status">
+                    <span class="card-badge"><i class="fa-solid fa-star"></i> Explored</span>
+                </div>
+                <div class="card-chevron"><i class="fa-solid fa-chevron-down"></i></div>
+            </div>
+            <div class="card-content">
+                <div class="card-body">
+                    <p><strong>MCP (Model Context Protocol)</strong> is how Claude connects to external tools and services. Think of MCPs as "USB ports" for Claude -- each one plugs in a new capability.</p>
+
+                    <p><strong>What MCPs can do:</strong></p>
+                    <ul>
+                        <li><strong>Filesystem</strong> -- read/write files, search directories</li>
+                        <li><strong>Browser control</strong> -- navigate websites, extract data, fill forms</li>
+                        <li><strong>Databases</strong> -- query SQL databases, manage data</li>
+                        <li><strong>APIs</strong> -- connect to Slack, Notion, GitHub, Jira, and hundreds more</li>
+                        <li><strong>Desktop control</strong> -- automate your computer, run scripts</li>
+                    </ul>
+
+                    <p><strong>Connectors</strong> are pre-built, first-party MCPs from Anthropic that make setup painless. Instead of configuring an MCP manually, connectors handle authentication and setup for popular services.</p>
+
+                    <div class="pro-tip">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <p><strong>Don't overwhelm yourself.</strong> Start with the basics (filesystem + GitHub) and add MCPs as you actually need them. The MCP registry has hundreds of community-built connectors for almost anything.</p>
+                    </div>
+
+                    <button class="explore-btn" onclick="markExplored(8, this, event)">
+                        <i class="fa-solid fa-circle-check"></i>
+                        Mark as Explored
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════════ MISSION 9 ════════ -->
+        <div class="mission-card" data-mission="9">
+            <div class="card-header" onclick="toggleCard(this)">
+                <div class="card-icon"><i class="fa-brands fa-chrome"></i></div>
+                <div class="card-info">
+                    <div class="card-title">Claude in Chrome</div>
+                    <div class="card-tagline">Let Claude see your browser</div>
+                </div>
+                <div class="card-status">
+                    <span class="card-badge"><i class="fa-solid fa-star"></i> Explored</span>
+                </div>
+                <div class="card-chevron"><i class="fa-solid fa-chevron-down"></i></div>
+            </div>
+            <div class="card-content">
+                <div class="card-body">
+                    <p>Claude can <strong>control your Chrome browser</strong> through MCP integrations. This is wild -- it can navigate pages, read content, fill forms, take screenshots, and interact with web apps.</p>
+
+                    <p><strong>Real use cases:</strong></p>
+                    <ul>
+                        <li><strong>Web scraping</strong> -- extract data from any website, even dynamic JavaScript-rendered pages</li>
+                        <li><strong>Testing</strong> -- have Claude test your web app by actually clicking through it like a real user</li>
+                        <li><strong>Automation</strong> -- fill out repetitive forms, navigate complex workflows</li>
+                        <li><strong>Research</strong> -- ask Claude to read a webpage and summarize it, or compare multiple pages</li>
+                        <li><strong>Debugging</strong> -- Claude can inspect console logs, network requests, and DOM elements</li>
+                    </ul>
+
+                    <div class="pro-tip">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <p><strong>Think bigger:</strong> Claude in Chrome isn't just for developers. You can use it to automate any browser workflow -- research, data entry, monitoring dashboards, testing user flows. It's like having a robot assistant that can use any website.</p>
+                    </div>
+
+                    <button class="explore-btn" onclick="markExplored(9, this, event)">
+                        <i class="fa-solid fa-circle-check"></i>
+                        Mark as Explored
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════════ MISSION 10 ════════ -->
+        <div class="mission-card" data-mission="10">
+            <div class="card-header" onclick="toggleCard(this)">
+                <div class="card-icon"><i class="fa-solid fa-stars"></i></div>
+                <div class="card-info">
+                    <div class="card-title">Pro Tips &amp; Next Steps</div>
+                    <div class="card-tagline">Level up your game</div>
+                </div>
+                <div class="card-status">
+                    <span class="card-badge"><i class="fa-solid fa-star"></i> Explored</span>
+                </div>
+                <div class="card-chevron"><i class="fa-solid fa-chevron-down"></i></div>
+            </div>
+            <div class="card-content">
+                <div class="card-body">
+                    <p>You've got the tools. Here's how to <strong>think like a power user</strong> from day one:</p>
+
+                    <p><strong>CLAUDE.md -- Your Secret Weapon:</strong></p>
+                    <ul>
+                        <li>Create a <code>CLAUDE.md</code> file in any project root</li>
+                        <li>Tell Claude your preferences: coding style, frameworks, testing approach</li>
+                        <li>Add project-specific context: "this is a Next.js app using Prisma and PostgreSQL"</li>
+                        <li>Claude reads this file automatically every session -- it's persistent memory for your project</li>
+                    </ul>
+
+                    <p><strong>Prompt engineering tips:</strong></p>
+                    <ul>
+                        <li><strong>Be specific</strong> -- "Add a login form with email/password using React Hook Form and Zod validation" beats "add login"</li>
+                        <li><strong>Give context</strong> -- "I'm building a social app for dog owners" helps Claude make better decisions</li>
+                        <li><strong>Iterate fast</strong> -- don't try to get it perfect in one shot. Build, review, refine</li>
+                        <li><strong>Use extended thinking</strong> -- for complex problems, Claude's thinking mode produces much better results</li>
+                    </ul>
+
+                    <p><strong>First project ideas for you, Cohen:</strong></p>
+                    <ul>
+                        <li>Build a personal portfolio site with Claude from scratch</li>
+                        <li>Create a CLI tool that does something useful for your workflow</li>
+                        <li>Clone a simple app you like (todo, weather, notes) to learn the patterns</li>
+                        <li>Automate something annoying with a script + Claude in Chrome</li>
+                    </ul>
+
+                    <div class="pro-tip">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <p><strong>The #1 rule:</strong> Don't be afraid to ask Claude anything. There are no dumb questions. The more you use it, the faster you'll learn what it's capable of. Break things, experiment, and have fun with it.</p>
+                    </div>
+
+                    <button class="explore-btn" onclick="markExplored(10, this, event)">
+                        <i class="fa-solid fa-circle-check"></i>
+                        Mark as Explored
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════════ FINAL CARD (hidden until 100%) ════════ -->
+        <div class="final-card" id="finalCard">
+            <div class="trophy"><i class="fa-solid fa-trophy" style="color: var(--gold)"></i></div>
+            <h2>You're Ready, Cohen.</h2>
+            <p>Every mission explored. Every tool unlocked. You now have the full arsenal. The only thing left is to go build something amazing. The universe is yours.</p>
+        </div>
+
+    </section>
+
+    <script>
+        /* ═══════════════════════════════════════════
+           STATE MANAGEMENT
+           ═══════════════════════════════════════════ */
+        const STORAGE_KEY = 'cohen-journey-progress';
+        const TOTAL_MISSIONS = 10;
+
+        function getProgress() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                return saved ? JSON.parse(saved) : {};
+            } catch (e) { return {}; }
+        }
+
+        function saveProgress(progress) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+        }
+
+        /* ═══════════════════════════════════════════
+           STAR FIELD
+           ═══════════════════════════════════════════ */
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function createStars(count) {
+            stars = [];
+            for (let i = 0; i < count; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 1.5 + 0.3,
+                    opacity: Math.random() * 0.7 + 0.1,
+                    drift: (Math.random() - 0.5) * 0.15,
+                    pulse: Math.random() * Math.PI * 2,
+                    pulseSpeed: Math.random() * 0.01 + 0.003
+                });
+            }
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (var i = 0; i < stars.length; i++) {
+                var star = stars[i];
+                star.pulse += star.pulseSpeed;
+                star.y += star.drift;
+                star.x += star.drift * 0.3;
+                var flicker = Math.sin(star.pulse) * 0.25 + 0.75;
+
+                // Wrap around
+                if (star.y < -5) star.y = canvas.height + 5;
+                if (star.y > canvas.height + 5) star.y = -5;
+                if (star.x < -5) star.x = canvas.width + 5;
+                if (star.x > canvas.width + 5) star.x = -5;
+
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(200, 200, 255, ' + (star.opacity * flicker) + ')';
+                ctx.fill();
+
+                // Glow for brighter stars
+                if (star.radius > 1) {
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.radius * 3, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(139, 92, 246, ' + (star.opacity * flicker * 0.1) + ')';
+                    ctx.fill();
+                }
+            }
+            requestAnimationFrame(drawStars);
+        }
+
+        resizeCanvas();
+        createStars(70);
+        drawStars();
+        window.addEventListener('resize', function() { resizeCanvas(); createStars(70); });
+
+        /* ═══════════════════════════════════════════
+           CARD TOGGLE
+           ═══════════════════════════════════════════ */
+        function toggleCard(headerEl) {
+            var card = headerEl.closest('.mission-card');
+            var wasExpanded = card.classList.contains('expanded');
+
+            // Collapse all others
+            var allCards = document.querySelectorAll('.mission-card.expanded');
+            for (var i = 0; i < allCards.length; i++) {
+                if (allCards[i] !== card) allCards[i].classList.remove('expanded');
+            }
+
+            if (wasExpanded) {
+                card.classList.remove('expanded');
+            } else {
+                card.classList.add('expanded');
+            }
+        }
+
+        /* ═══════════════════════════════════════════
+           MARK AS EXPLORED
+           ═══════════════════════════════════════════ */
+        function markExplored(missionId, btnEl, evt) {
+            if (evt) evt.stopPropagation();
+            var progress = getProgress();
+            if (progress[missionId]) return;
+
+            progress[missionId] = true;
+            saveProgress(progress);
+
+            // Update button using textContent and DOM methods (safe)
+            btnEl.textContent = '';
+            var icon = document.createElement('i');
+            icon.className = 'fa-solid fa-circle-check';
+            btnEl.appendChild(icon);
+            btnEl.appendChild(document.createTextNode(' Explored!'));
+            btnEl.classList.add('explored');
+
+            // Update card
+            var card = btnEl.closest('.mission-card');
+            card.classList.add('completed');
+
+            // Sparkle effect at button position
+            createSparkles(btnEl);
+
+            // Update progress UI
+            updateProgressUI();
+
+            // Check for 100% completion
+            var completedCount = Object.keys(progress).length;
+            if (completedCount >= TOTAL_MISSIONS) {
+                setTimeout(function() {
+                    document.getElementById('finalCard').classList.add('revealed');
+                    launchConfetti();
+                }, 600);
+            }
+        }
+
+        /* ═══════════════════════════════════════════
+           PROGRESS UI
+           ═══════════════════════════════════════════ */
+        function updateProgressUI() {
+            var progress = getProgress();
+            var completedCount = Object.keys(progress).length;
+            var pct = (completedCount / TOTAL_MISSIONS) * 100;
+
+            document.getElementById('progressFill').style.width = pct + '%';
+            document.getElementById('progressText').textContent = completedCount + '/' + TOTAL_MISSIONS;
+
+            // Star indicators - build using DOM methods (safe, no innerHTML)
+            var starsEl = document.getElementById('starIndicators');
+            while (starsEl.firstChild) starsEl.removeChild(starsEl.firstChild);
+            for (var i = 1; i <= TOTAL_MISSIONS; i++) {
+                var star = document.createElement('i');
+                star.className = progress[i] ? 'fa-solid fa-star earned' : 'fa-regular fa-star';
+                starsEl.appendChild(star);
+            }
+
+            // Update card states
+            var cards = document.querySelectorAll('.mission-card');
+            for (var j = 0; j < cards.length; j++) {
+                var card = cards[j];
+                var id = parseInt(card.getAttribute('data-mission'));
+                if (progress[id]) {
+                    card.classList.add('completed');
+                    var btn = card.querySelector('.explore-btn');
+                    if (btn && !btn.classList.contains('explored')) {
+                        btn.textContent = '';
+                        var ic = document.createElement('i');
+                        ic.className = 'fa-solid fa-circle-check';
+                        btn.appendChild(ic);
+                        btn.appendChild(document.createTextNode(' Explored!'));
+                        btn.classList.add('explored');
+                    }
+                }
+            }
+
+            // Show final card if all complete
+            if (completedCount >= TOTAL_MISSIONS) {
+                document.getElementById('finalCard').classList.add('revealed');
+            }
+        }
+
+        /* ═══════════════════════════════════════════
+           SPARKLE EFFECT
+           ═══════════════════════════════════════════ */
+        function createSparkles(el) {
+            var rect = el.getBoundingClientRect();
+            var container = document.getElementById('sparkleContainer');
+            var colors = ['#f59e0b', '#fbbf24', '#8b5cf6', '#a78bfa', '#ffffff'];
+
+            for (var i = 0; i < 12; i++) {
+                var sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = (rect.left + rect.width / 2 + (Math.random() - 0.5) * 60) + 'px';
+                sparkle.style.top = (rect.top + (Math.random() - 0.5) * 20) + 'px';
+                sparkle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                sparkle.style.animationDuration = (0.6 + Math.random() * 0.6) + 's';
+                container.appendChild(sparkle);
+                (function(s) {
+                    setTimeout(function() { s.remove(); }, 1200);
+                })(sparkle);
+            }
+        }
+
+        /* ═══════════════════════════════════════════
+           CONFETTI CELEBRATION
+           ═══════════════════════════════════════════ */
+        function launchConfetti() {
+            var container = document.getElementById('sparkleContainer');
+            var colors = ['#f59e0b', '#fbbf24', '#8b5cf6', '#a78bfa', '#10b981', '#f472b6', '#60a5fa'];
+
+            for (var i = 0; i < 60; i++) {
+                (function(idx) {
+                    setTimeout(function() {
+                        var piece = document.createElement('div');
+                        piece.className = 'confetti-piece';
+                        piece.style.left = Math.random() * 100 + 'vw';
+                        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                        piece.style.width = (Math.random() * 8 + 4) + 'px';
+                        piece.style.height = (Math.random() * 8 + 4) + 'px';
+                        piece.style.animationDuration = (2 + Math.random() * 2) + 's';
+                        container.appendChild(piece);
+                        setTimeout(function() { piece.remove(); }, 4000);
+                    }, idx * 40);
+                })(i);
+            }
+        }
+
+        /* ═══════════════════════════════════════════
+           SCROLL EFFECTS
+           ═══════════════════════════════════════════ */
+        window.addEventListener('scroll', function() {
+            var topBar = document.getElementById('topBar');
+            if (window.scrollY > 10) {
+                topBar.classList.add('scrolled');
+            } else {
+                topBar.classList.remove('scrolled');
+            }
+        });
+
+        // Card reveal on scroll (IntersectionObserver)
+        var observer = new IntersectionObserver(function(entries) {
+            for (var i = 0; i < entries.length; i++) {
+                if (entries[i].isIntersecting) {
+                    entries[i].target.classList.add('visible');
+                    observer.unobserve(entries[i].target);
+                }
+            }
+        }, { threshold: 0.1 });
+
+        var missionCards = document.querySelectorAll('.mission-card');
+        for (var i = 0; i < missionCards.length; i++) {
+            missionCards[i].style.animationDelay = (i * 0.08) + 's';
+            observer.observe(missionCards[i]);
+        }
+
+        /* ═══════════════════════════════════════════
+           INIT
+           ═══════════════════════════════════════════ */
+        updateProgressUI();
+    </script>
+</body>
+</html>
