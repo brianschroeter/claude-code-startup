@@ -829,7 +829,7 @@
             <div class="progress-container">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
-            <div class="progress-text" id="progressText">0/10</div>
+            <div class="progress-text" id="progressText">0/11</div>
         </div>
     </div>
 
@@ -847,7 +847,7 @@
         </button>
         <div class="hero-stats">
             <i class="fa-solid fa-constellation"></i>
-            <span>10 missions to explore</span>
+            <span>11 missions to explore</span>
         </div>
     </section>
 
@@ -1255,6 +1255,71 @@
         <!-- ════════ MISSION 10 ════════ -->
         <div class="mission-card" data-mission="10">
             <div class="card-header" onclick="toggleCard(this)">
+                <div class="card-icon"><i class="fa-solid fa-scroll"></i></div>
+                <div class="card-info">
+                    <div class="card-title">Skills &amp; Skill Builder</div>
+                    <div class="card-tagline">Teach Claude new tricks</div>
+                </div>
+                <div class="card-status">
+                    <span class="card-badge"><i class="fa-solid fa-star"></i> Explored</span>
+                </div>
+                <div class="card-chevron"><i class="fa-solid fa-chevron-down"></i></div>
+            </div>
+            <div class="card-content">
+                <div class="card-body">
+                    <p><strong>Skills</strong> are reusable workflows and instructions that Claude Code can follow. Think of them as "playbooks" -- when you invoke a skill, Claude loads a set of expert instructions and follows them precisely. They're one of the most powerful ways to get consistent, high-quality results.</p>
+
+                    <p><strong>How skills work:</strong></p>
+                    <ul>
+                        <li>You invoke a skill with a slash command like <code>/frontend-design</code> or <code>/brainstorming</code></li>
+                        <li>Claude loads the skill's instructions and follows them step-by-step</li>
+                        <li>Skills can include checklists, workflows, and best practices that Claude will enforce</li>
+                        <li>They come from plugins -- install a plugin to unlock its skills</li>
+                    </ul>
+
+                    <p><strong>Recommended skills to start with:</strong></p>
+                    <ul>
+                        <li><strong>frontend-design</strong> -- Generates distinctive, production-grade UI with exceptional design quality. Avoids generic "AI slop" aesthetics. This very page was built using it!</li>
+                        <li><strong>brainstorming</strong> -- Turns rough ideas into fully-formed designs through Socratic questioning before you write any code</li>
+                        <li><strong>test-driven-development</strong> -- Write tests first, watch them fail, then implement. Enforces disciplined TDD workflow</li>
+                        <li><strong>systematic-debugging</strong> -- Four-phase debugging framework: investigate root cause, analyze patterns, test hypotheses, then implement fixes</li>
+                        <li><strong>writing-plans</strong> -- Creates detailed implementation plans with exact file paths and code examples</li>
+                    </ul>
+
+                    <p><strong><i class="fa-solid fa-hammer" style="color:var(--gold)"></i> The Skill Builder:</strong></p>
+                    <p>Here's the really cool part -- you can <strong>create your own skills</strong>. The Skill Builder (<code>/skill-creator</code>) lets you:</p>
+                    <ul>
+                        <li>Design custom workflows tailored to your specific projects</li>
+                        <li>Test skills with sub-agents before deploying them</li>
+                        <li>Iterate and refine skills until they're bulletproof</li>
+                        <li>Share skills with others via the plugin ecosystem</li>
+                    </ul>
+
+                    <div class="code-block"><code><span class="comment"># Browse available skills</span>
+<span class="cmd">/help</span>
+
+<span class="comment"># Use a skill directly</span>
+<span class="cmd">/frontend-design</span> <span class="flag">Build a dashboard for my app</span>
+
+<span class="comment"># Create your own custom skill</span>
+<span class="cmd">/skill-creator</span></code></div>
+
+                    <div class="pro-tip">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <p><strong>Start by using skills, then build your own.</strong> Once you notice yourself repeating the same workflow (like "always lint before committing" or "always check tests after changes"), that's a perfect candidate for a custom skill. Skills turn your best practices into enforced habits.</p>
+                    </div>
+
+                    <button class="explore-btn" onclick="markExplored(10, this, event)">
+                        <i class="fa-solid fa-circle-check"></i>
+                        Mark as Explored
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════════ MISSION 11 ════════ -->
+        <div class="mission-card" data-mission="11">
+            <div class="card-header" onclick="toggleCard(this)">
                 <div class="card-icon"><i class="fa-solid fa-stars"></i></div>
                 <div class="card-info">
                     <div class="card-title">Pro Tips &amp; Next Steps</div>
@@ -1298,7 +1363,7 @@
                         <p><strong>The #1 rule:</strong> Don't be afraid to ask Claude anything. There are no dumb questions. The more you use it, the faster you'll learn what it's capable of. Break things, experiment, and have fun with it.</p>
                     </div>
 
-                    <button class="explore-btn" onclick="markExplored(10, this, event)">
+                    <button class="explore-btn" onclick="markExplored(11, this, event)">
                         <i class="fa-solid fa-circle-check"></i>
                         Mark as Explored
                     </button>
@@ -1320,7 +1385,7 @@
            STATE MANAGEMENT
            ═══════════════════════════════════════════ */
         const STORAGE_KEY = 'cohen-journey-progress';
-        const TOTAL_MISSIONS = 10;
+        const TOTAL_MISSIONS = 11;
 
         function getProgress() {
             try {
