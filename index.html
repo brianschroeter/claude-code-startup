@@ -938,7 +938,7 @@
                         <li><strong>Extended thinking</strong> -- Claude can "think longer" on hard problems, producing dramatically better results for complex coding tasks</li>
                         <li><strong>Priority access</strong> -- you skip the queue when servers are busy</li>
                         <li><strong>Claude Opus</strong> -- access to the most powerful model in the family, best for deep reasoning and complex projects</li>
-                        <li><strong>Dispatch &amp; Cowork</strong> -- MAX-exclusive features for multi-agent workflows</li>
+                        <li><strong>Dispatch &amp; Cowork</strong> -- advanced agentic features (Cowork available on Pro+, Dispatch on MAX plans)</li>
                     </ul>
 
                     <div class="pro-tip">
@@ -1079,8 +1079,8 @@
                         <li><strong>Dispatch from phone</strong> -- assign tasks from your phone via QR code pairing, come back to finished work</li>
                     </ul>
 
-                    <div class="code-block"><code><span class="comment"># Start Claude Code in cowork mode</span>
-<span class="cmd">claude</span> <span class="flag">--cowork</span>
+                    <div class="code-block"><code><span class="comment"># Cowork is accessed via the Claude Desktop app's Cowork tab</span>
+<span class="comment"># Open Claude Desktop → click the Cowork tab to switch modes</span>
 
 <span class="comment"># Or use scheduled tasks</span>
 <span class="cmd">/loop</span> <span class="flag">every morning, review my overnight PRs</span></code></div>
@@ -1117,7 +1117,7 @@
 
                     <p><strong>Dispatch (from your phone!):</strong></p>
                     <ul>
-                        <li>Pair your phone to your desktop via QR code scan (takes ~2 minutes)</li>
+                        <li>Pair your phone to your desktop via QR code scan (takes under 2 minutes)</li>
                         <li>Assign tasks from anywhere -- Claude works on your desktop while you're away</li>
                         <li>Come back to finished work, review the results, and iterate</li>
                         <li>Maintains context across sessions -- no re-explaining needed</li>
@@ -1143,7 +1143,7 @@
 
                     <div class="pro-tip">
                         <i class="fa-solid fa-lightbulb"></i>
-                        <p><strong>MAX exclusive.</strong> Agent Teams require the Opus 4.6 model and use significant compute. Use them for bigger tasks where parallelism matters -- small scripts don't need a whole team. Also try <strong>Voice Mode</strong> (hold spacebar) for hands-free coding!</p>
+                        <p><strong>Heads up:</strong> Agent Teams are experimental and disabled by default -- you'll need to enable them with a flag. They work best with the Opus 4.6 model and use significant compute. Use them for bigger tasks where parallelism matters -- small scripts don't need a whole team. Also try <strong>Voice Mode</strong> (hold spacebar) for hands-free coding!</p>
                     </div>
 
                     <button class="explore-btn" onclick="markExplored(6, this, event)">
@@ -1313,8 +1313,8 @@
                         </tr>
                         <tr>
                             <td><strong>Benchmarks</strong></td>
-                            <td>SWE-bench Verified: ~80%</td>
-                            <td>SWE-bench Verified: ~69%</td>
+                            <td>SWE-bench Verified: ~79%</td>
+                            <td>SWE-bench Verified: ~78%</td>
                         </tr>
                         <tr>
                             <td><strong>MCP ecosystem</strong></td>
@@ -1506,7 +1506,7 @@
                     <p><strong>Platform tips:</strong></p>
                     <ul>
                         <li><strong>Windows users:</strong> Install Git for Windows first, use PowerShell or WSL 2. Keep projects in the Linux filesystem if using WSL</li>
-                        <li><strong>Mac users:</strong> Cowork requires Apple Silicon (M1+). Install via <code>brew install --cask claude-code</code></li>
+                        <li><strong>Mac users:</strong> Cowork requires Apple Silicon (M1+) and the Claude Desktop app. Install the CLI via <code>brew install --cask claude-code</code></li>
                         <li><strong>VS Code users:</strong> Install the official Claude Code extension for inline diffs, @-mentions, and visual diff review</li>
                     </ul>
 
