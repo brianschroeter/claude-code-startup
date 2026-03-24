@@ -829,7 +829,7 @@
             <div class="progress-container">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
-            <div class="progress-text" id="progressText">0/11</div>
+            <div class="progress-text" id="progressText">0/13</div>
         </div>
     </div>
 
@@ -847,7 +847,7 @@
         </button>
         <div class="hero-stats">
             <i class="fa-solid fa-constellation"></i>
-            <span>11 missions to explore</span>
+            <span>13 missions to explore</span>
         </div>
     </section>
 
@@ -971,16 +971,27 @@
                 <div class="card-body">
                     <p>Claude Code CLI is where the real magic happens. It lives in your terminal and can <strong>read, write, and execute</strong> files on your machine. It's like having a senior developer pair-programming with you 24/7.</p>
 
-                    <p><strong>Getting started:</strong></p>
-                    <div class="code-block"><code><span class="comment"># Install Claude Code globally</span>
-<span class="cmd">npm</span> install -g <span class="flag">@anthropic-ai/claude-code</span>
+                    <p><strong>Getting started (pick your platform):</strong></p>
+                    <div class="code-block"><code><span class="comment"># macOS (recommended)</span>
+<span class="cmd">brew</span> install --cask <span class="flag">claude-code</span>
+
+<span class="comment"># Windows (PowerShell)</span>
+<span class="cmd">irm</span> <span class="flag">https://claude.ai/install.ps1</span> | iex
+
+<span class="comment"># Linux / macOS alternative</span>
+<span class="cmd">curl</span> -fsSL <span class="flag">https://claude.ai/install.sh</span> | bash
 
 <span class="comment"># Navigate to your project and launch</span>
 <span class="cmd">cd</span> my-project
 <span class="cmd">claude</span>
 
-<span class="comment"># Or start a brand new project</span>
-<span class="cmd">claude</span> <span class="flag">"Create a React app with a todo list"</span></code></div>
+<span class="comment"># Auto-generate a CLAUDE.md for your project</span>
+<span class="cmd">/init</span></code></div>
+
+                    <div class="pro-tip">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <p><strong>Note:</strong> The old <code>npm install -g @anthropic-ai/claude-code</code> method is <strong>deprecated</strong>. Use the native installer above -- it auto-updates and has zero dependencies. Windows users: install <strong>Git for Windows</strong> first.</p>
+                    </div>
 
                     <p><strong>Key slash commands you'll use constantly:</strong></p>
                     <ul>
@@ -1057,25 +1068,26 @@
             </div>
             <div class="card-content">
                 <div class="card-body">
-                    <p>Cowork is one of the coolest features exclusive to your MAX plan. It turns Claude into a <strong>background coding partner</strong> that watches what you're working on and proactively helps.</p>
+                    <p>Cowork is one of the coolest features exclusive to your MAX plan. It's an <strong>agentic workspace</strong> where Claude operates directly on your computer -- reading, editing, and creating files while you focus on the big picture.</p>
 
-                    <p><strong>How it works:</strong></p>
+                    <p><strong>What Cowork can do:</strong></p>
                     <ul>
-                        <li>Claude monitors your code changes in real-time</li>
-                        <li>It can suggest improvements, catch bugs, and offer refactors</li>
-                        <li>You stay in the driver's seat -- Claude assists, you decide</li>
-                        <li>Think of it like having a code reviewer watching over your shoulder (in a good way!)</li>
+                        <li><strong>Computer Use</strong> (brand new!) -- Claude can point, click, and navigate your screen directly. It opens apps, fills spreadsheets, uses the browser, and runs dev tools</li>
+                        <li><strong>Scheduled tasks</strong> -- tell Claude to scan your inbox every morning, pull weekly metrics every Friday, or run daily code reviews automatically</li>
+                        <li><strong>Follow a plan</strong> -- approve Claude's plan, then let it execute independently within boundaries you set</li>
+                        <li><strong>Connectors</strong> -- built-in integrations with Google Calendar, Slack, and more</li>
+                        <li><strong>Dispatch from phone</strong> -- assign tasks from your phone via QR code pairing, come back to finished work</li>
                     </ul>
 
                     <div class="code-block"><code><span class="comment"># Start Claude Code in cowork mode</span>
 <span class="cmd">claude</span> <span class="flag">--cowork</span>
 
-<span class="comment"># Or use the /cowork command inside a session</span>
-<span class="cmd">/cowork</span></code></div>
+<span class="comment"># Or use scheduled tasks</span>
+<span class="cmd">/loop</span> <span class="flag">every morning, review my overnight PRs</span></code></div>
 
                     <div class="pro-tip">
                         <i class="fa-solid fa-lightbulb"></i>
-                        <p><strong>Best for:</strong> Longer coding sessions where you want a safety net. Cowork catches the bugs you'd normally find hours later in testing.</p>
+                        <p><strong>Computer Use just launched (March 2026)!</strong> Claude asks permission before accessing each new app, and you can stop it at any point. Try asking it to open your browser, navigate to a site, and extract data -- it's like having a robot assistant on your desktop.</p>
                     </div>
 
                     <button class="explore-btn" onclick="markExplored(5, this, event)">
@@ -1101,28 +1113,37 @@
             </div>
             <div class="card-content">
                 <div class="card-body">
-                    <p>Dispatch is the <strong>newest and most powerful</strong> feature in the Claude Code ecosystem. It lets you orchestrate <strong>multiple Claude agents in parallel</strong> -- like having a whole team of developers at your command.</p>
+                    <p>Dispatch and <strong>Agent Teams</strong> are the most powerful features in Claude Code. They let you orchestrate <strong>multiple Claude agents working in parallel</strong> -- like having a whole development team at your command.</p>
 
-                    <p><strong>What you can do:</strong></p>
+                    <p><strong>Dispatch (from your phone!):</strong></p>
                     <ul>
-                        <li><strong>Parallel tasks</strong> -- ask Claude to work on multiple files or features simultaneously</li>
-                        <li><strong>Sub-agents</strong> -- Claude spawns focused workers for specific jobs, then synthesizes the results</li>
-                        <li><strong>Complex projects</strong> -- break down an entire app into pieces and have agents tackle each part</li>
-                        <li><strong>Research + Build</strong> -- one agent researches the approach while another starts scaffolding</li>
+                        <li>Pair your phone to your desktop via QR code scan (takes ~2 minutes)</li>
+                        <li>Assign tasks from anywhere -- Claude works on your desktop while you're away</li>
+                        <li>Come back to finished work, review the results, and iterate</li>
+                        <li>Maintains context across sessions -- no re-explaining needed</li>
                     </ul>
 
-                    <div class="code-block"><code><span class="comment"># Example: Claude dispatches agents for parallel work</span>
-<span class="cmd">claude</span> <span class="flag">"Build a full-stack todo app. Create the</span>
-<span class="flag">API, frontend, and database schema in parallel."</span>
+                    <p><strong>Agent Teams (the real game-changer):</strong></p>
+                    <ul>
+                        <li>A <strong>team lead</strong> agent spawns independent <strong>teammate</strong> agents</li>
+                        <li>Each teammate gets their own isolated git worktree -- no conflicts</li>
+                        <li>They coordinate through a shared task list and direct messaging</li>
+                        <li>Perfect for complex projects where multiple parts can be built simultaneously</li>
+                    </ul>
 
-<span class="comment"># Claude automatically dispatches sub-agents:</span>
-<span class="comment">#   Agent 1: Database schema design</span>
-<span class="comment">#   Agent 2: REST API endpoints</span>
-<span class="comment">#   Agent 3: React frontend components</span></code></div>
+                    <div class="code-block"><code><span class="comment"># Claude dispatches an Agent Team:</span>
+<span class="comment">#   Team Lead: Orchestrates the project</span>
+<span class="comment">#   Teammate 1: Database schema (own worktree)</span>
+<span class="comment">#   Teammate 2: REST API endpoints (own worktree)</span>
+<span class="comment">#   Teammate 3: React frontend (own worktree)</span>
+
+<span class="comment"># Bonus: Voice Mode (rolling out!)</span>
+<span class="comment"># Hold spacebar to talk to Claude</span>
+<span class="comment"># Supports 20 languages</span></code></div>
 
                     <div class="pro-tip">
                         <i class="fa-solid fa-lightbulb"></i>
-                        <p><strong>This is a MAX exclusive.</strong> Dispatch uses significantly more compute, which is why it requires a MAX plan. Use it for bigger tasks where parallelism actually helps -- small scripts don't need it.</p>
+                        <p><strong>MAX exclusive.</strong> Agent Teams require the Opus 4.6 model and use significant compute. Use them for bigger tasks where parallelism matters -- small scripts don't need a whole team. Also try <strong>Voice Mode</strong> (hold spacebar) for hands-free coding!</p>
                     </div>
 
                     <button class="explore-btn" onclick="markExplored(6, this, event)">
@@ -1255,6 +1276,128 @@
         <!-- ════════ MISSION 10 ════════ -->
         <div class="mission-card" data-mission="10">
             <div class="card-header" onclick="toggleCard(this)">
+                <div class="card-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+                <div class="card-info">
+                    <div class="card-title">Claude Code vs Codex</div>
+                    <div class="card-tagline">Know your tools, use both wisely</div>
+                </div>
+                <div class="card-status">
+                    <span class="card-badge"><i class="fa-solid fa-star"></i> Explored</span>
+                </div>
+                <div class="card-chevron"><i class="fa-solid fa-chevron-down"></i></div>
+            </div>
+            <div class="card-content">
+                <div class="card-body">
+                    <p>OpenAI's <strong>Codex</strong> is another powerful coding agent. It's not a competition -- smart developers use both. Here's how they compare and complement each other:</p>
+
+                    <table class="compare-table">
+                        <tr>
+                            <th></th>
+                            <th>Claude Code</th>
+                            <th>OpenAI Codex</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Style</strong></td>
+                            <td>Interactive pair programmer</td>
+                            <td>Autonomous task agent</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Best for</strong></td>
+                            <td>Real-time coding, debugging, greenfield projects</td>
+                            <td>Async batch tasks, PR generation, parallel work</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Execution</strong></td>
+                            <td>Local-first (your machine)</td>
+                            <td>Cloud sandboxes + local CLI</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Benchmarks</strong></td>
+                            <td>SWE-bench Verified: ~80%</td>
+                            <td>SWE-bench Verified: ~69%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>MCP ecosystem</strong></td>
+                            <td>300+ community servers</td>
+                            <td>Newer, growing</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Open source</strong></td>
+                            <td>No</td>
+                            <td>CLI is open source (Apache 2.0)</td>
+                        </tr>
+                    </table>
+
+                    <p><strong>Using them together (the power move):</strong></p>
+                    <ul>
+                        <li><strong>Plan with Claude</strong> -- brainstorm architecture and design in Claude Desktop or CLI</li>
+                        <li><strong>Build with Claude Code</strong> -- real-time interactive coding for core implementation</li>
+                        <li><strong>Batch with Codex</strong> -- assign repetitive tasks (test generation, migrations, refactoring) to Codex for async parallel execution</li>
+                        <li><strong>Review with both</strong> -- get a second opinion on PRs by having both review your code</li>
+                    </ul>
+
+                    <div class="pro-tip">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <p><strong>Community consensus:</strong> Claude Code leads on code quality and developer experience. Codex leads on cost efficiency and async workflows. The savviest developers use both -- Claude Code for the "flow state" interactive work, Codex for the "fire and forget" batch jobs.</p>
+                    </div>
+
+                    <button class="explore-btn" onclick="markExplored(10, this, event)">
+                        <i class="fa-solid fa-circle-check"></i>
+                        Mark as Explored
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════════ MISSION 11 ════════ -->
+        <div class="mission-card" data-mission="11">
+            <div class="card-header" onclick="toggleCard(this)">
+                <div class="card-icon"><i class="fa-solid fa-people-group"></i></div>
+                <div class="card-info">
+                    <div class="card-title">Community &amp; Resources</div>
+                    <div class="card-tagline">You're not alone out here</div>
+                </div>
+                <div class="card-status">
+                    <span class="card-badge"><i class="fa-solid fa-star"></i> Explored</span>
+                </div>
+                <div class="card-chevron"><i class="fa-solid fa-chevron-down"></i></div>
+            </div>
+            <div class="card-content">
+                <div class="card-body">
+                    <p>One of the best ways to level up fast is to <strong>learn from the community</strong>. There are thousands of developers sharing tips, workflows, and projects built with Claude Code.</p>
+
+                    <p><strong>Essential communities to join:</strong></p>
+                    <ul>
+                        <li><strong>r/ClaudeAI</strong> -- the main subreddit for all things Claude. Tips, tricks, workflows, and discussions from power users</li>
+                        <li><strong>r/ClaudeCode</strong> -- focused specifically on Claude Code CLI, plugins, and development workflows</li>
+                        <li><strong>GitHub Discussions</strong> -- the official Claude Code repo has active discussions, feature requests, and bug reports</li>
+                        <li><strong>Anthropic Discord</strong> -- real-time chat with other Claude users and developers</li>
+                    </ul>
+
+                    <p><strong>Learning resources:</strong></p>
+                    <ul>
+                        <li><strong>code.claude.com/docs</strong> -- official documentation (your primary reference)</li>
+                        <li><strong>claude.com/blog</strong> -- Anthropic's blog with feature announcements and deep dives</li>
+                        <li><strong>YouTube</strong> -- search "Claude Code tutorial" for walkthrough videos</li>
+                        <li><strong>awesome-claude-code</strong> -- community-curated GitHub repo of tools, plugins, and resources</li>
+                    </ul>
+
+                    <div class="pro-tip">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <p><strong>Reddit pro tip:</strong> Sort r/ClaudeAI by "Top - This Month" to find the best recent workflows and tips. People regularly share their CLAUDE.md files, plugin setups, and project showcases. It's a goldmine for learning what's possible.</p>
+                    </div>
+
+                    <button class="explore-btn" onclick="markExplored(11, this, event)">
+                        <i class="fa-solid fa-circle-check"></i>
+                        Mark as Explored
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════════ MISSION 12 ════════ -->
+        <div class="mission-card" data-mission="12">
+            <div class="card-header" onclick="toggleCard(this)">
                 <div class="card-icon"><i class="fa-solid fa-scroll"></i></div>
                 <div class="card-info">
                     <div class="card-title">Skills &amp; Skill Builder</div>
@@ -1309,7 +1452,7 @@
                         <p><strong>Start by using skills, then build your own.</strong> Once you notice yourself repeating the same workflow (like "always lint before committing" or "always check tests after changes"), that's a perfect candidate for a custom skill. Skills turn your best practices into enforced habits.</p>
                     </div>
 
-                    <button class="explore-btn" onclick="markExplored(10, this, event)">
+                    <button class="explore-btn" onclick="markExplored(12, this, event)">
                         <i class="fa-solid fa-circle-check"></i>
                         Mark as Explored
                     </button>
@@ -1317,8 +1460,8 @@
             </div>
         </div>
 
-        <!-- ════════ MISSION 11 ════════ -->
-        <div class="mission-card" data-mission="11">
+        <!-- ════════ MISSION 13 ════════ -->
+        <div class="mission-card" data-mission="13">
             <div class="card-header" onclick="toggleCard(this)">
                 <div class="card-icon"><i class="fa-solid fa-stars"></i></div>
                 <div class="card-info">
@@ -1350,12 +1493,21 @@
                         <li><strong>Use extended thinking</strong> -- for complex problems, Claude's thinking mode produces much better results</li>
                     </ul>
 
-                    <p><strong>First project ideas for you, Cohen:</strong></p>
+                    <p><strong>Starter project ideas for you, Cohen</strong> (easiest to most ambitious):</p>
                     <ul>
-                        <li>Build a personal portfolio site with Claude from scratch</li>
-                        <li>Create a CLI tool that does something useful for your workflow</li>
-                        <li>Clone a simple app you like (todo, weather, notes) to learn the patterns</li>
-                        <li>Automate something annoying with a script + Claude in Chrome</li>
+                        <li><strong>Personal website</strong> (10 min) -- your name, bio, links. Use <code>/init</code> + one prompt. Learn the basics</li>
+                        <li><strong>Retro space shooter game</strong> (30 min) -- HTML5 Canvas game with enemies and power-ups. Fun and visual</li>
+                        <li><strong>CLI quiz game</strong> (20 min) -- trivia on any topic you love. Learn core coding concepts</li>
+                        <li><strong>AI study buddy</strong> (1-2 hrs) -- generates flashcards from your notes using the Claude API. Learn API integration</li>
+                        <li><strong>Personal command center</strong> (2-4 hrs) -- Cowork skills + Dispatch from your phone. Morning briefings, homework organizer</li>
+                        <li><strong>Multi-agent research machine</strong> (6-10 hrs) -- parallel agents that research, organize, and summarize topics. The ultimate capstone</li>
+                    </ul>
+
+                    <p><strong>Platform tips:</strong></p>
+                    <ul>
+                        <li><strong>Windows users:</strong> Install Git for Windows first, use PowerShell or WSL 2. Keep projects in the Linux filesystem if using WSL</li>
+                        <li><strong>Mac users:</strong> Cowork requires Apple Silicon (M1+). Install via <code>brew install --cask claude-code</code></li>
+                        <li><strong>VS Code users:</strong> Install the official Claude Code extension for inline diffs, @-mentions, and visual diff review</li>
                     </ul>
 
                     <div class="pro-tip">
@@ -1363,7 +1515,7 @@
                         <p><strong>The #1 rule:</strong> Don't be afraid to ask Claude anything. There are no dumb questions. The more you use it, the faster you'll learn what it's capable of. Break things, experiment, and have fun with it.</p>
                     </div>
 
-                    <button class="explore-btn" onclick="markExplored(11, this, event)">
+                    <button class="explore-btn" onclick="markExplored(13, this, event)">
                         <i class="fa-solid fa-circle-check"></i>
                         Mark as Explored
                     </button>
@@ -1385,7 +1537,7 @@
            STATE MANAGEMENT
            ═══════════════════════════════════════════ */
         const STORAGE_KEY = 'cohen-journey-progress';
-        const TOTAL_MISSIONS = 11;
+        const TOTAL_MISSIONS = 13;
 
         function getProgress() {
             try {
